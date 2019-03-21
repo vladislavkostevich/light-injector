@@ -1,6 +1,6 @@
 package by.kostevich.lightinjector;
 
-import by.kostevich.lightinjector.factory.LightInjectorFactory;
+import by.kostevich.lightinjector.impl.LightInjectorFactory;
 
 public interface LightInjector {
 

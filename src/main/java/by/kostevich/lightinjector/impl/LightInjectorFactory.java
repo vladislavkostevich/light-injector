@@ -1,11 +1,11 @@
-package by.kostevich.lightinjector.factory;
+package by.kostevich.lightinjector.impl;
 
 import by.kostevich.lightinjector.LightInjectionModule;
 import by.kostevich.lightinjector.LightInjector;
-import by.kostevich.lightinjector.LightInjectorImpl;
-import by.kostevich.lightinjector.bean.DependencyDefinition;
-import by.kostevich.lightinjector.bean.LightComponentConfiguration;
-import by.kostevich.lightinjector.bean.LightInjectContext;
+import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
+import by.kostevich.lightinjector.impl.bean.LightComponentConfiguration;
+import by.kostevich.lightinjector.impl.bean.LightInjectContext;
+import by.kostevich.lightinjector.impl.bean.PropertyDefinition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -54,6 +54,8 @@ public class LightInjectorFactory {
             }
             dependencies.add(dependency);
         });
+
+        List<PropertyDefinition> propertyDefinitions = componentConfiguration.getPropertyDefinitions();
 
         try {
             Object createdComponent;

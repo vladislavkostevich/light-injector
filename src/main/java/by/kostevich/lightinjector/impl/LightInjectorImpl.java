@@ -1,7 +1,8 @@
-package by.kostevich.lightinjector;
+package by.kostevich.lightinjector.impl;
 
-import by.kostevich.lightinjector.bean.DependencyDefinition;
-import by.kostevich.lightinjector.bean.LightInjectContext;
+import by.kostevich.lightinjector.LightInjector;
+import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
+import by.kostevich.lightinjector.impl.bean.LightInjectContext;
 
 public class LightInjectorImpl implements LightInjector {
 
@@ -13,7 +14,7 @@ public class LightInjectorImpl implements LightInjector {
 
     @Override
     public <T> T getComponent(Class<T> componentClass) {
-        return (T) context.findComponent(new DependencyDefinition(componentClass, null));
+        return getComponent(componentClass, null);
     }
 
     @Override

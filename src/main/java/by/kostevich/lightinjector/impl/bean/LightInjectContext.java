@@ -1,4 +1,4 @@
-package by.kostevich.lightinjector.bean;
+package by.kostevich.lightinjector.impl.bean;
 
 import by.kostevich.lightinjector.LightInjectionModule;
 

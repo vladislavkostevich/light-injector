@@ -1,4 +1,4 @@
-package by.kostevich.lightinjector.bean;
+package by.kostevich.lightinjector.impl.bean;
 
 public class DependencyDefinition {
     private Class<?> dependencyClass;
