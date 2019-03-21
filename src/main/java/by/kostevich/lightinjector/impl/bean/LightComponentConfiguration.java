@@ -1,18 +1,9 @@
 package by.kostevich.lightinjector.impl.bean;
 
-import by.kostevich.lightinjector.annotations.LightName;
-import by.kostevich.lightinjector.annotations.LightProperty;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.Arrays.asList;
 
 public class LightComponentConfiguration {
 
@@ -23,7 +14,6 @@ public class LightComponentConfiguration {
     private Method componentCreationMethod;
 
     private List<DependencyDefinition> dependencyDefinitions;
-    private List<PropertyDefinition> propertyDefinitions;
 
     private Set<Class<?>> componentSuperClasses;
     private Set<Class<?>> componentInterfaces;
@@ -49,10 +39,6 @@ public class LightComponentConfiguration {
 
     public List<DependencyDefinition> getDependencyDefinitions() {
         return dependencyDefinitions;
-    }
-
-    public List<PropertyDefinition> getPropertyDefinitions() {
-        return propertyDefinitions;
     }
 
     public Set<Class<?>> getComponentSuperClasses() {
@@ -81,10 +67,6 @@ public class LightComponentConfiguration {
 
     public void setDependencyDefinitions(List<DependencyDefinition> dependencyDefinitions) {
         this.dependencyDefinitions = dependencyDefinitions;
-    }
-
-    public void setPropertyDefinitions(List<PropertyDefinition> propertyDefinitions) {
-        this.propertyDefinitions = propertyDefinitions;
     }
 
     public void setComponentSuperClasses(Set<Class<?>> componentSuperClasses) {

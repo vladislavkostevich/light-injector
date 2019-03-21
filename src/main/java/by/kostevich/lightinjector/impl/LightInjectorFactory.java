@@ -55,8 +55,6 @@ public class LightInjectorFactory {
             dependencies.add(dependency);
         });
 
-        List<PropertyDefinition> propertyDefinitions = componentConfiguration.getPropertyDefinitions();
-
         try {
             Object createdComponent;
             if (componentConfiguration.isCreatedByConstructor()) {
