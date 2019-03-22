@@ -1,25 +1,29 @@
-package by.kostevich.lightinjector.impl;
+package by.kostevich.lightinjector.impl.component;
 
 import by.kostevich.lightinjector.LightInjectionModule;
 import by.kostevich.lightinjector.annotations.LightComponent;
 import by.kostevich.lightinjector.annotations.LightInject;
 import by.kostevich.lightinjector.impl.bean.ComponentDefinition;
+import by.kostevich.lightinjector.impl.bean.UniqueComponentId;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-public class ModuleConfigurationReader {
+public class ModuleComponentsReader {
 
-    public static Set<ComponentDefinition> readComponentsConfigurations(LightInjectionModule module) {
+    public static Set<ComponentDefinition> readComponents(LightInjectionModule module) {
         Set<ComponentDefinition> componentConfigurations = new HashSet<>();
 
-        Map<String, Class<?>> moduleConfigs = getModuleComponentsConfig(module);
-        moduleConfigs.forEach((componentName, componentClass) -> {
+        Set<UniqueComponentId> componentIds = getModuleComponentsConfig(module);
+        componentIds.forEach(componentId -> {
             try {
+                Class<?> componentClass = componentId.getComponentClass();
+                String componentName = componentId.getComponentName();
+
                 Constructor<?> injectionConstructor = Arrays.stream(componentClass.getConstructors())
                         .filter(constructor -> constructor.getAnnotation(LightInject.class) != null)
                         .findAny().orElse(null);
@@ -49,15 +53,15 @@ public class ModuleConfigurationReader {
         return componentConfigurations;
     }
 
-    private static Map<String, Class<?>> getModuleComponentsConfig(LightInjectionModule module) {
+    private static Set<UniqueComponentId> getModuleComponentsConfig(LightInjectionModule module) {
         try {
             Method configureMethod = module.getClass().getDeclaredMethod("configureInjections");
             configureMethod.setAccessible(true);
             configureMethod.invoke(module);
 
-            Method getComponentsNamesAndClassesMethod = module.getClass().getDeclaredMethod("getComponentsNamesAndClasses");
-            getComponentsNamesAndClassesMethod.setAccessible(true);
-            return (Map<String, Class<?>>) getComponentsNamesAndClassesMethod.invoke(module);
+            Field componentIdsField = module.getClass().getDeclaredField("componentIds");
+            componentIdsField.setAccessible(true);
+            return (Set<UniqueComponentId>) componentIdsField.get(module);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

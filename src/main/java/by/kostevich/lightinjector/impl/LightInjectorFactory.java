@@ -2,9 +2,11 @@ package by.kostevich.lightinjector.impl;
 
 import by.kostevich.lightinjector.LightInjectionModule;
 import by.kostevich.lightinjector.LightInjector;
-import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
 import by.kostevich.lightinjector.impl.bean.ComponentDefinition;
+import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
 import by.kostevich.lightinjector.impl.bean.InjectContext;
+import by.kostevich.lightinjector.impl.component.ComponentLookup;
+import by.kostevich.lightinjector.impl.properties.PropertiesLookup;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -15,16 +17,13 @@ import java.util.Set;
 public class LightInjectorFactory {
 
     public static LightInjector createInjector(LightInjectionModule module) {
-        Set<ComponentDefinition> componentConfigurations =
-                ModuleConfigurationReader.readComponentsConfigurations(module);
+        InjectContext context = InjectContextCreator.createContext(module);
 
-        InjectContext context = new InjectContext();
-        context.setModule(module);
-        context.setComponentDefinitions(componentConfigurations);
+        Set<ComponentDefinition> componentDefinitions = context.getComponentDefinitions();
 
-        componentConfigurations.forEach(componentConfiguration -> {
-            if (context.getComponents().get(componentConfiguration.getComponentId()) == null) {
-                createComponent(componentConfiguration, context);
+        componentDefinitions.forEach(componentDefinition -> {
+            if (context.getComponents().get(componentDefinition.getComponentId()) == null) {
+                createComponent(componentDefinition, context);
             }
         });
 
@@ -45,14 +44,18 @@ public class LightInjectorFactory {
         List<Object> dependencies = new ArrayList<>(dependencyDefinitions.size());
 
         dependencyDefinitions.forEach(dependencyDefinition -> {
-            ComponentDefinition dependencyConfiguration =
-                    ContextLookup.findComponentConfiguration(context, dependencyDefinition);
-
-            Object dependency = context.getComponents().get(dependencyConfiguration.getComponentId());
-            if (dependency == null) {
-                dependency = createComponent(dependencyConfiguration, context);
+            if (dependencyDefinition.isProperty()) {
+                Object propertyValue = PropertiesLookup.findPropertyValue(context, dependencyDefinition);
+                dependencies.add(propertyValue);
+            } else {
+                ComponentDefinition dependencyComponentDefinition =
+                        ComponentLookup.findComponentDefinition(context, dependencyDefinition);
+                Object dependencyComponent = context.getComponents().get(dependencyComponentDefinition.getComponentId());
+                if (dependencyComponent == null) {
+                    dependencyComponent = createComponent(dependencyComponentDefinition, context);
+                }
+                dependencies.add(dependencyComponent);
             }
-            dependencies.add(dependency);
         });
 
         try {

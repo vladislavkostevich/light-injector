@@ -1,4 +1,4 @@
-package by.kostevich.lightinjector.impl;
+package by.kostevich.lightinjector.impl.component;
 
 import by.kostevich.lightinjector.annotations.LightName;
 import by.kostevich.lightinjector.annotations.LightProperty;

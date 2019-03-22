@@ -1,4 +1,4 @@
-package by.kostevich.lightinjector.impl;
+package by.kostevich.lightinjector.impl.component;
 
 import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
 import by.kostevich.lightinjector.impl.bean.ComponentDefinition;
@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public class ContextLookup {
+public class ComponentLookup {
 
-    public static ComponentDefinition findComponentConfiguration(
+    public static ComponentDefinition findComponentDefinition(
             InjectContext context,
             DependencyDefinition dependencyDefinition) {
 
@@ -84,7 +84,7 @@ public class ContextLookup {
     public static Object findComponent(InjectContext context, DependencyDefinition dependencyDefinition) {
         Map<UniqueComponentId, Object> components = context.getComponents();
 
-        ComponentDefinition componentConfiguration = findComponentConfiguration(context, dependencyDefinition);
+        ComponentDefinition componentConfiguration = findComponentDefinition(context, dependencyDefinition);
         return components.get(componentConfiguration.getComponentId());
     }
 

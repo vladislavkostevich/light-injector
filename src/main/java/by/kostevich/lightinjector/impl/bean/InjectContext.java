@@ -10,6 +10,7 @@ public class InjectContext {
 
     private LightInjectionModule module;
     private Set<ComponentDefinition> componentDefinitions;
+    private Set<PropertyValuesHolder> propertyValues;
     private Map<UniqueComponentId, Object> components = new HashMap<>();
 
     public LightInjectionModule getModule() {
@@ -26,6 +27,14 @@ public class InjectContext {
 
     public void setComponentDefinitions(Set<ComponentDefinition> componentDefinitions) {
         this.componentDefinitions = componentDefinitions;
+    }
+
+    public Set<PropertyValuesHolder> getPropertyValues() {
+        return propertyValues;
+    }
+
+    public void setPropertyValues(Set<PropertyValuesHolder> propertyValues) {
+        this.propertyValues = propertyValues;
     }
 
     public void addComponent(UniqueComponentId componentId, Object component) {
