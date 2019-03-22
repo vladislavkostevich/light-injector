@@ -30,6 +30,10 @@ public abstract class LightInjectionModule {
         return componentsNamesAndClasses;
     }
 
+    private List<PropertiesConfigurer> getPropertiesConfigurers() {
+        return propertiesConfigurers;
+    }
+
     public class PropertiesConfigurer<T> {
 
         private Map<String, T> valuesMap;

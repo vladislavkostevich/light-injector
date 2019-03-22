@@ -1,8 +1,10 @@
-package by.kostevich.lightinjector.impl.bean;
+package by.kostevich.lightinjector.impl;
 
-import by.kostevich.lightinjector.LightInjectionModule;
+import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
+import by.kostevich.lightinjector.impl.bean.ComponentDefinition;
+import by.kostevich.lightinjector.impl.bean.InjectContext;
+import by.kostevich.lightinjector.impl.bean.UniqueComponentId;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,42 +12,23 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public class LightInjectContext {
+public class ContextLookup {
 
-    private LightInjectionModule module;
-    private Set<LightComponentConfiguration> componentConfigurations;
-    private Map<Class<?>, Object> components = new HashMap<>();
+    public static ComponentDefinition findComponentConfiguration(
+            InjectContext context,
+            DependencyDefinition dependencyDefinition) {
 
-    public LightInjectionModule getModule() {
-        return module;
-    }
+        Set<ComponentDefinition> componentConfigurations = context.getComponentDefinitions();
 
-    public void setModule(LightInjectionModule module) {
-        this.module = module;
-    }
-
-    public void setComponentConfigurations(Set<LightComponentConfiguration> componentConfigurations) {
-        this.componentConfigurations = componentConfigurations;
-    }
-
-    public void addComponent(Class<?> componentClass, Object component) {
-        components.put(componentClass, component);
-    }
-
-    public Map<Class<?>, Object> getComponents() {
-        return components;
-    }
-
-    public LightComponentConfiguration findComponentConfiguration(DependencyDefinition dependencyDefinition) {
-        List<LightComponentConfiguration> configurationByDirectType = componentConfigurations.stream()
+        List<ComponentDefinition> configurationByDirectType = componentConfigurations.stream()
                 .filter(componentConfiguration ->
-                        componentConfiguration.getComponentClass().equals(dependencyDefinition.getDependencyClass()))
+                        componentConfiguration.getComponentId().getComponentClass().equals(dependencyDefinition.getDependencyClass()))
                 .collect(Collectors.toList());
         if (!configurationByDirectType.isEmpty()) {
             return findComponentConfigurationByName(configurationByDirectType, dependencyDefinition);
         }
 
-        List<LightComponentConfiguration> configurationBySuperClasses = componentConfigurations.stream()
+        List<ComponentDefinition> configurationBySuperClasses = componentConfigurations.stream()
                 .filter(componentConfiguration ->
                         componentConfiguration.getComponentSuperClasses().contains(dependencyDefinition.getDependencyClass()))
                 .collect(Collectors.toList());
@@ -53,7 +36,7 @@ public class LightInjectContext {
             return findComponentConfigurationByName(configurationBySuperClasses, dependencyDefinition);
         }
 
-        List<LightComponentConfiguration> configurationByInterfaces = componentConfigurations.stream()
+        List<ComponentDefinition> configurationByInterfaces = componentConfigurations.stream()
                 .filter(componentConfiguration ->
                         componentConfiguration.getComponentInterfaces().contains(dependencyDefinition.getDependencyClass()))
                 .collect(Collectors.toList());
@@ -67,8 +50,8 @@ public class LightInjectContext {
                         dependencyDefinition.getDependencyName()));
     }
 
-    private LightComponentConfiguration findComponentConfigurationByName(
-            List<LightComponentConfiguration> configurations, DependencyDefinition dependencyDefinition) {
+    private static ComponentDefinition findComponentConfigurationByName(
+            List<ComponentDefinition> configurations, DependencyDefinition dependencyDefinition) {
 
         String dependencyName = dependencyDefinition.getDependencyName();
         if (dependencyName == null) {
@@ -79,9 +62,9 @@ public class LightInjectContext {
             return configurations.get(0);
         }
 
-        List<LightComponentConfiguration> configurationsByName = configurations.stream()
+        List<ComponentDefinition> configurationsByName = configurations.stream()
                 .filter(componentConfiguration ->
-                        componentConfiguration.getComponentName().equalsIgnoreCase(dependencyDefinition.getDependencyName()))
+                        componentConfiguration.getComponentId().getComponentName().equalsIgnoreCase(dependencyDefinition.getDependencyName()))
                 .collect(Collectors.toList());
         if (configurationsByName.isEmpty()) {
             throw new IllegalStateException(
@@ -98,8 +81,11 @@ public class LightInjectContext {
         return configurationsByName.get(0);
     }
 
-    public Object findComponent(DependencyDefinition dependencyDefinition) {
-        LightComponentConfiguration componentConfiguration = findComponentConfiguration(dependencyDefinition);
-        return components.get(componentConfiguration.getComponentClass());
+    public static Object findComponent(InjectContext context, DependencyDefinition dependencyDefinition) {
+        Map<UniqueComponentId, Object> components = context.getComponents();
+
+        ComponentDefinition componentConfiguration = findComponentConfiguration(context, dependencyDefinition);
+        return components.get(componentConfiguration.getComponentId());
     }
+
 }

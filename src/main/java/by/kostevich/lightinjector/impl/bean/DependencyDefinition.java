@@ -6,6 +6,11 @@ public class DependencyDefinition {
     private boolean isProperty;
     private String defaultValue;
 
+    public DependencyDefinition(Class<?> dependencyClass, String dependencyName) {
+        this.dependencyClass = dependencyClass;
+        this.dependencyName = dependencyName;
+    }
+
     public DependencyDefinition(Class<?> dependencyClass, String dependencyName, boolean isProperty, String defaultValue) {
         this.dependencyClass = dependencyClass;
         this.dependencyName = dependencyName;

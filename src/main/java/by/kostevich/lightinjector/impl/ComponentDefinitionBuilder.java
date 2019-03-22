@@ -3,7 +3,8 @@ package by.kostevich.lightinjector.impl;
 import by.kostevich.lightinjector.annotations.LightName;
 import by.kostevich.lightinjector.annotations.LightProperty;
 import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
-import by.kostevich.lightinjector.impl.bean.LightComponentConfiguration;
+import by.kostevich.lightinjector.impl.bean.ComponentDefinition;
+import by.kostevich.lightinjector.impl.bean.UniqueComponentId;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -16,12 +17,12 @@ import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 
-public class ComponentConfigurationCreator {
+public class ComponentDefinitionBuilder {
 
-    public static LightComponentConfiguration withConstructorCreation(
+    public static ComponentDefinition withConstructorCreation(
             Class<?> componentClass, String componentName, Constructor<?> componentConstructor) {
 
-        LightComponentConfiguration componentConfiguration =
+        ComponentDefinition componentConfiguration =
                 create(componentClass, componentName, componentConstructor.getParameters());
 
         componentConstructor.setAccessible(true);
@@ -30,10 +31,10 @@ public class ComponentConfigurationCreator {
         return componentConfiguration;
     }
 
-    public static LightComponentConfiguration withMethodCreation(
+    public static ComponentDefinition withMethodCreation(
             Class<?> componentClass, String componentName, Method componentCreationMethod) {
 
-        LightComponentConfiguration componentConfiguration =
+        ComponentDefinition componentConfiguration =
                 create(componentClass, componentName, componentCreationMethod.getParameters());
 
         componentCreationMethod.setAccessible(true);
@@ -42,12 +43,11 @@ public class ComponentConfigurationCreator {
         return componentConfiguration;
     }
 
-    private static LightComponentConfiguration create(
+    private static ComponentDefinition create(
             Class<?> componentClass, String componentName, Parameter[] creationParameters) {
 
-        LightComponentConfiguration configuration = new LightComponentConfiguration();
-        configuration.setComponentClass(componentClass);
-        configuration.setComponentName(componentName);
+        ComponentDefinition configuration = new ComponentDefinition();
+        configuration.setComponentId(new UniqueComponentId(componentClass, componentName));
         configuration.setDependencyDefinitions(resolveDependencyDefinitions(creationParameters));
         configuration.setComponentSuperClasses(resolveComponentSuperClasses(componentClass));
         configuration.setComponentInterfaces(

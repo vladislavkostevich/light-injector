@@ -3,9 +3,8 @@ package by.kostevich.lightinjector.impl;
 import by.kostevich.lightinjector.LightInjectionModule;
 import by.kostevich.lightinjector.LightInjector;
 import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
-import by.kostevich.lightinjector.impl.bean.LightComponentConfiguration;
-import by.kostevich.lightinjector.impl.bean.LightInjectContext;
-import by.kostevich.lightinjector.impl.bean.PropertyDefinition;
+import by.kostevich.lightinjector.impl.bean.ComponentDefinition;
+import by.kostevich.lightinjector.impl.bean.InjectContext;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -16,15 +15,15 @@ import java.util.Set;
 public class LightInjectorFactory {
 
     public static LightInjector createInjector(LightInjectionModule module) {
-        Set<LightComponentConfiguration> componentConfigurations =
+        Set<ComponentDefinition> componentConfigurations =
                 ModuleConfigurationReader.readComponentsConfigurations(module);
 
-        LightInjectContext context = new LightInjectContext();
+        InjectContext context = new InjectContext();
         context.setModule(module);
-        context.setComponentConfigurations(componentConfigurations);
+        context.setComponentDefinitions(componentConfigurations);
 
         componentConfigurations.forEach(componentConfiguration -> {
-            if (context.getComponents().get(componentConfiguration.getComponentClass()) == null) {
+            if (context.getComponents().get(componentConfiguration.getComponentId()) == null) {
                 createComponent(componentConfiguration, context);
             }
         });
@@ -39,16 +38,17 @@ public class LightInjectorFactory {
     }
 
     private static Object createComponent(
-            LightComponentConfiguration componentConfiguration,
-            LightInjectContext context) {
+            ComponentDefinition componentConfiguration,
+            InjectContext context) {
 
         List<DependencyDefinition> dependencyDefinitions = componentConfiguration.getDependencyDefinitions();
         List<Object> dependencies = new ArrayList<>(dependencyDefinitions.size());
 
         dependencyDefinitions.forEach(dependencyDefinition -> {
-            LightComponentConfiguration dependencyConfiguration = context.findComponentConfiguration(dependencyDefinition);
+            ComponentDefinition dependencyConfiguration =
+                    ContextLookup.findComponentConfiguration(context, dependencyDefinition);
 
-            Object dependency = context.getComponents().get(dependencyConfiguration.getComponentClass());
+            Object dependency = context.getComponents().get(dependencyConfiguration.getComponentId());
             if (dependency == null) {
                 dependency = createComponent(dependencyConfiguration, context);
             }
@@ -64,7 +64,7 @@ public class LightInjectorFactory {
                 Method creationJavaMethod = componentConfiguration.getComponentCreationMethod();
                 createdComponent = creationJavaMethod.invoke(context.getModule(), dependencies.toArray());
             }
-            context.addComponent(componentConfiguration.getComponentClass(), createdComponent);
+            context.addComponent(componentConfiguration.getComponentId(), createdComponent);
             return createdComponent;
         } catch (Exception e) {
             throw new RuntimeException(e);
