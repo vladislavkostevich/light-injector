@@ -9,8 +9,7 @@ public class LightInjectorImpl implements LightInjector {
 
     private InjectContext context;
 
-    private LightInjectorImpl(InjectContext context) {
-        this.context = context;
+    private LightInjectorImpl() {
     }
 
     @Override
@@ -21,6 +20,10 @@ public class LightInjectorImpl implements LightInjector {
     @Override
     public <T> T getComponent(Class<T> componentClass, String componentName) {
         return (T) ComponentLookup.findComponent(context, new DependencyDefinition(componentClass, componentName));
+    }
+
+    private void setContext(InjectContext injectContext) {
+        this.context = injectContext;
     }
 
 }

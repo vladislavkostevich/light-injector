@@ -1,6 +1,7 @@
 package by.kostevich.lightinjector.impl.bean;
 
 import by.kostevich.lightinjector.LightInjectionModule;
+import by.kostevich.lightinjector.impl.LightInjectorImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,7 @@ public class InjectContext {
     private Set<ComponentDefinition> componentDefinitions;
     private Set<PropertyValuesHolder> propertyValues;
     private Map<UniqueComponentId, Object> components = new HashMap<>();
+    private LightInjectorImpl lightInjector;
 
     public LightInjectionModule getModule() {
         return module;
@@ -43,5 +45,13 @@ public class InjectContext {
 
     public Map<UniqueComponentId, Object> getComponents() {
         return components;
+    }
+
+    public LightInjectorImpl getLightInjector() {
+        return lightInjector;
+    }
+
+    public void setLightInjector(LightInjectorImpl lightInjector) {
+        this.lightInjector = lightInjector;
     }
 }

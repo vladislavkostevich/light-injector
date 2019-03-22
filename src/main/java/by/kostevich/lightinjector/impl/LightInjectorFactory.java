@@ -27,13 +27,9 @@ public class LightInjectorFactory {
             }
         });
 
-        try {
-            Constructor<?> injectorConstructor = LightInjectorImpl.class.getDeclaredConstructors()[0];
-            injectorConstructor.setAccessible(true);
-            return (LightInjector) injectorConstructor.newInstance(context);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        LightInjectorImpl lightInjector = context.getLightInjector();
+        setContextToInjector(lightInjector, context);
+        return lightInjector;
     }
 
     private static Object createComponent(
@@ -44,18 +40,24 @@ public class LightInjectorFactory {
         List<Object> dependencies = new ArrayList<>(dependencyDefinitions.size());
 
         dependencyDefinitions.forEach(dependencyDefinition -> {
+            if (isInjector(dependencyDefinition)) {
+                dependencies.add(context.getLightInjector());
+                return;
+            }
+
             if (dependencyDefinition.isProperty()) {
                 Object propertyValue = PropertiesLookup.findPropertyValue(context, dependencyDefinition);
                 dependencies.add(propertyValue);
-            } else {
-                ComponentDefinition dependencyComponentDefinition =
-                        ComponentLookup.findComponentDefinition(context, dependencyDefinition);
-                Object dependencyComponent = context.getComponents().get(dependencyComponentDefinition.getComponentId());
-                if (dependencyComponent == null) {
-                    dependencyComponent = createComponent(dependencyComponentDefinition, context);
-                }
-                dependencies.add(dependencyComponent);
+                return;
             }
+
+            ComponentDefinition dependencyComponentDefinition =
+                    ComponentLookup.findComponentDefinition(context, dependencyDefinition);
+            Object dependencyComponent = context.getComponents().get(dependencyComponentDefinition.getComponentId());
+            if (dependencyComponent == null) {
+                dependencyComponent = createComponent(dependencyComponentDefinition, context);
+            }
+            dependencies.add(dependencyComponent);
         });
 
         try {
@@ -72,5 +74,19 @@ public class LightInjectorFactory {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void setContextToInjector(LightInjectorImpl lightInjector, InjectContext context) {
+        try {
+            Method setContextMethod = lightInjector.getClass().getDeclaredMethod("setContext", InjectContext.class);
+            setContextMethod.setAccessible(true);
+            setContextMethod.invoke(lightInjector, context);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isInjector(DependencyDefinition dependencyDefinition) {
+        return dependencyDefinition.getDependencyClass().equals(LightInjector.class);
     }
 }

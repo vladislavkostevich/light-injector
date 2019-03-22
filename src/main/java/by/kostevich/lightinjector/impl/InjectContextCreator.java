@@ -7,6 +7,7 @@ import by.kostevich.lightinjector.impl.bean.PropertyValuesHolder;
 import by.kostevich.lightinjector.impl.component.ModuleComponentsReader;
 import by.kostevich.lightinjector.impl.properties.ModulePropertiesReader;
 
+import java.lang.reflect.Constructor;
 import java.util.Set;
 
 public class InjectContextCreator {
@@ -19,7 +20,18 @@ public class InjectContextCreator {
         injectContext.setModule(module);
         injectContext.setComponentDefinitions(componentDefinitions);
         injectContext.setPropertyValues(propertyValues);
+        injectContext.setLightInjector(createLightInjector());
 
         return injectContext;
+    }
+
+    private static LightInjectorImpl createLightInjector() {
+        try {
+            Constructor<LightInjectorImpl> constructor = LightInjectorImpl.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
