@@ -33,7 +33,7 @@ public class ModulePropertiesReader {
 
     private static List<PropertiesConfigurer> getPropertiesConfigurers(LightInjectionModule module) {
         try {
-            Field propertiesConfigurersField = module.getClass().getDeclaredField("propertiesConfigurers");
+            Field propertiesConfigurersField = LightInjectionModule.class.getDeclaredField("propertiesConfigurers");
             propertiesConfigurersField.setAccessible(true);
             return (List<PropertiesConfigurer>) propertiesConfigurersField.get(module);
         } catch (Exception e) {

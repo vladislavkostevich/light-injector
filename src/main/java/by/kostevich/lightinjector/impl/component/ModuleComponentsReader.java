@@ -59,7 +59,7 @@ public class ModuleComponentsReader {
             configureMethod.setAccessible(true);
             configureMethod.invoke(module);
 
-            Field componentIdsField = module.getClass().getDeclaredField("componentIds");
+            Field componentIdsField = LightInjectionModule.class.getDeclaredField("componentIds");
             componentIdsField.setAccessible(true);
             return (Set<UniqueComponentId>) componentIdsField.get(module);
         } catch (Exception e) {

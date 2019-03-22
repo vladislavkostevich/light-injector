@@ -7,6 +7,7 @@ import by.kostevich.lightinjector.impl.bean.PropertyType;
 import by.kostevich.lightinjector.impl.bean.PropertyValuesHolder;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,9 +46,18 @@ public class PropertiesLookup {
     private static String getEnvironment(InjectContext injectContext) {
         LightInjectionModule lightInjectionModule = injectContext.getModule();
         try {
-            Method getEnvNameMethod = lightInjectionModule.getClass().getDeclaredMethod("getEnvironmentName");
+            Method getEnvNameMethod = Arrays.stream(lightInjectionModule.getClass().getDeclaredMethods())
+                    .filter(declaredMethod -> declaredMethod.getName().equals("getEnvironmentName"))
+                    .findFirst().orElse(null);
+            if (getEnvNameMethod == null) {
+                getEnvNameMethod = LightInjectionModule.class.getDeclaredMethod("getEnvironmentName");
+            }
             getEnvNameMethod.setAccessible(true);
-            return (String) getEnvNameMethod.invoke(lightInjectionModule);
+            String environment = (String) getEnvNameMethod.invoke(lightInjectionModule);
+            if (environment == null) {
+                throw new IllegalStateException("Environment variable is not defined");
+            }
+            return environment;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

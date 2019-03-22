@@ -53,7 +53,7 @@ public abstract class LightInjectionModule {
     public static class PropertiesConfigurer<T> {
         private String propertyName;
         private PropertyType propertyType;
-        private Map<String, Object> valuesMap;
+        private Map<String, Object> valuesMap = new HashMap<>();
 
         private PropertiesConfigurer(String propertyName, PropertyType propertyType) {
             this.propertyName = propertyName;
@@ -80,7 +80,7 @@ public abstract class LightInjectionModule {
                 this.envName = envName;
             }
 
-            public PropertiesConfigurer withValue(T value) {
+            public PropertiesConfigurer<T> withValue(T value) {
                 valuesMap.put(envName, value);
                 return PropertiesConfigurer.this;
             }
