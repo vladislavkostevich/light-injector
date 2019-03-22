@@ -64,6 +64,13 @@ public class PropertiesLookup {
     }
 
     private static Object getDefaultValue(String propertyDefaultValue, PropertyType propertyType, String propertyName, Class<?> propertyClass) {
+        if (propertyType == null) {
+            throw new IllegalStateException(
+                    format("Property with name %s tried to be injected by unsupported type %s",
+                            propertyName, propertyClass.getSimpleName())
+            );
+        }
+
         switch (propertyType) {
             case STRING:
                 return propertyDefaultValue;

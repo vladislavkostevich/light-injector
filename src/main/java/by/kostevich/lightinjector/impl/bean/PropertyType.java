@@ -1,19 +1,21 @@
 package by.kostevich.lightinjector.impl.bean;
 
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public enum PropertyType {
-    STRING(String.class), INTEGER(Integer.class), BOOLEAN(Boolean.class);
+    STRING(String.class), INTEGER(Integer.class, int.class), BOOLEAN(Boolean.class, boolean.class);
 
-    private Class<?> propertyClass;
+    private Set<Class<?>> supportedPropertyClasses;
 
-    PropertyType(Class<?> propertyClass) {
-        this.propertyClass = propertyClass;
+    PropertyType(Class<?>... supportedPropertyClasses) {
+        this.supportedPropertyClasses = Arrays.stream(supportedPropertyClasses).collect(Collectors.toSet());
     }
 
     public static PropertyType getByClass(Class<?> propertyClass) {
         return Arrays.stream(values())
-                .filter(propertyType -> propertyType.propertyClass.equals(propertyClass))
+                .filter(propertyType -> propertyType.supportedPropertyClasses.contains(propertyClass))
                 .findFirst().orElse(null);
     }
 }
