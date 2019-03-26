@@ -15,21 +15,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static java.lang.String.format;
+
 public class LightInjectorFactory {
 
     public static LightInjector createInjector(LightInjectionModule module) {
+        long injectionContextCreationStartTime = System.currentTimeMillis();
+
         InjectContext context = InjectContextCreator.createContext(module);
 
         Set<ComponentDefinition> componentDefinitions = context.getComponentDefinitions();
 
+        long componentsCreationStartTime = System.currentTimeMillis();
         componentDefinitions.forEach(componentDefinition -> {
             if (context.getComponents().get(componentDefinition.getComponentId()) == null) {
                 createComponent(componentDefinition, context);
             }
         });
+        System.out.println(format("[DEBUG] LightInject - All components creation completed in %s ms", System.currentTimeMillis() - componentsCreationStartTime));
+
 
         LightInjectorImpl lightInjector = context.getLightInjector();
         setContextToInjector(lightInjector, context);
+
+        System.out.println(format("[DEBUG] LightInject - Overall context creation completed in %s ms", System.currentTimeMillis() - injectionContextCreationStartTime));
+
         return lightInjector;
     }
 
@@ -71,6 +81,12 @@ public class LightInjectorFactory {
                 createdComponent = creationMethod.getJavaMethod().invoke(creationMethod.getModule(), dependencies.toArray());
             }
             context.addComponent(componentConfiguration.getComponentId(), createdComponent);
+
+            System.out.println(format(
+                    "[DEBUG] LightInject - Component created [Class = %s, Name = %s]",
+                    componentConfiguration.getComponentId().getComponentClass().getSimpleName(),
+                    componentConfiguration.getComponentId().getComponentName()
+            ));
             return createdComponent;
         } catch (Exception e) {
             throw new RuntimeException(e);
