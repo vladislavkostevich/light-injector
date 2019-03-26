@@ -2,6 +2,7 @@ package by.kostevich.lightinjector.impl;
 
 import by.kostevich.lightinjector.LightInjectionModule;
 import by.kostevich.lightinjector.LightInjector;
+import by.kostevich.lightinjector.impl.bean.ComponentCreationMethod;
 import by.kostevich.lightinjector.impl.bean.ComponentDefinition;
 import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
 import by.kostevich.lightinjector.impl.bean.InjectContext;
@@ -66,8 +67,8 @@ public class LightInjectorFactory {
                 Constructor<?> creationConstructor = componentConfiguration.getComponentConstructor();
                 createdComponent = creationConstructor.newInstance(dependencies.toArray());
             } else {
-                Method creationJavaMethod = componentConfiguration.getComponentCreationMethod();
-                createdComponent = creationJavaMethod.invoke(context.getModule(), dependencies.toArray());
+                ComponentCreationMethod creationMethod = componentConfiguration.getComponentCreationMethod();
+                createdComponent = creationMethod.getJavaMethod().invoke(creationMethod.getModule(), dependencies.toArray());
             }
             context.addComponent(componentConfiguration.getComponentId(), createdComponent);
             return createdComponent;

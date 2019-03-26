@@ -1,7 +1,9 @@
 package by.kostevich.lightinjector.impl.component;
 
+import by.kostevich.lightinjector.LightInjectionModule;
 import by.kostevich.lightinjector.annotations.LightName;
 import by.kostevich.lightinjector.annotations.LightProperty;
+import by.kostevich.lightinjector.impl.bean.ComponentCreationMethod;
 import by.kostevich.lightinjector.impl.bean.DependencyDefinition;
 import by.kostevich.lightinjector.impl.bean.ComponentDefinition;
 import by.kostevich.lightinjector.impl.bean.UniqueComponentId;
@@ -32,13 +34,13 @@ public class ComponentDefinitionBuilder {
     }
 
     public static ComponentDefinition withMethodCreation(
-            Class<?> componentClass, String componentName, Method componentCreationMethod) {
+            Class<?> componentClass, String componentName, Method javaMethod, LightInjectionModule module) {
 
         ComponentDefinition componentConfiguration =
-                create(componentClass, componentName, componentCreationMethod.getParameters());
+                create(componentClass, componentName, javaMethod.getParameters());
 
-        componentCreationMethod.setAccessible(true);
-        componentConfiguration.setComponentCreationMethod(componentCreationMethod);
+        javaMethod.setAccessible(true);
+        componentConfiguration.setComponentCreationMethod(new ComponentCreationMethod(javaMethod, module));
 
         return componentConfiguration;
     }

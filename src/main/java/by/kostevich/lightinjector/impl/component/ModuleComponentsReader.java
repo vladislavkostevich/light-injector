@@ -8,7 +8,6 @@ import by.kostevich.lightinjector.impl.bean.UniqueComponentId;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +45,7 @@ public class ModuleComponentsReader {
                     String componentName = lightComponentAnnotation.name().isEmpty() ?
                             method.getReturnType().getSimpleName() : lightComponentAnnotation.name();
                     ComponentDefinition componentConfiguration = ComponentDefinitionBuilder
-                            .withMethodCreation(method.getReturnType(), componentName, method);
+                            .withMethodCreation(method.getReturnType(), componentName, method, module);
                     componentConfigurations.add(componentConfiguration);
                 });
 
@@ -55,10 +54,6 @@ public class ModuleComponentsReader {
 
     private static Set<UniqueComponentId> getModuleComponentsConfig(LightInjectionModule module) {
         try {
-            Method configureMethod = module.getClass().getDeclaredMethod("configureInjections");
-            configureMethod.setAccessible(true);
-            configureMethod.invoke(module);
-
             Field componentIdsField = LightInjectionModule.class.getDeclaredField("componentIds");
             componentIdsField.setAccessible(true);
             return (Set<UniqueComponentId>) componentIdsField.get(module);

@@ -1,7 +1,6 @@
 package by.kostevich.lightinjector.impl.bean;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -11,7 +10,7 @@ public class ComponentDefinition {
     private UniqueComponentId componentId;
 
     private Constructor<?> componentConstructor;
-    private Method componentCreationMethod;
+    private ComponentCreationMethod componentCreationMethod;
 
     private List<DependencyDefinition> dependencyDefinitions;
 
@@ -34,11 +33,11 @@ public class ComponentDefinition {
         this.componentConstructor = componentConstructor;
     }
 
-    public Method getComponentCreationMethod() {
+    public ComponentCreationMethod getComponentCreationMethod() {
         return componentCreationMethod;
     }
 
-    public void setComponentCreationMethod(Method componentCreationMethod) {
+    public void setComponentCreationMethod(ComponentCreationMethod componentCreationMethod) {
         this.componentCreationMethod = componentCreationMethod;
     }
 
@@ -75,16 +74,11 @@ public class ComponentDefinition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ComponentDefinition that = (ComponentDefinition) o;
-        return Objects.equals(componentId, that.componentId) &&
-                Objects.equals(componentConstructor, that.componentConstructor) &&
-                Objects.equals(componentCreationMethod, that.componentCreationMethod) &&
-                Objects.equals(dependencyDefinitions, that.dependencyDefinitions) &&
-                Objects.equals(componentSuperClasses, that.componentSuperClasses) &&
-                Objects.equals(componentInterfaces, that.componentInterfaces);
+        return Objects.equals(componentId, that.componentId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(componentId, componentConstructor, componentCreationMethod, dependencyDefinitions, componentSuperClasses, componentInterfaces);
+        return Objects.hash(componentId);
     }
 }

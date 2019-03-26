@@ -38,12 +38,11 @@ public class PropertyValuesHolder {
         if (o == null || getClass() != o.getClass()) return false;
         PropertyValuesHolder that = (PropertyValuesHolder) o;
         return Objects.equals(propertyName, that.propertyName) &&
-                Objects.equals(propertyType, that.propertyType) &&
-                Objects.equals(propertyEnvValues, that.propertyEnvValues);
+                Objects.equals(propertyType, that.propertyType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(propertyName, propertyType, propertyEnvValues);
+        return Objects.hash(propertyName, propertyType);
     }
 }
